@@ -22,7 +22,7 @@ class Portfolio extends Component {
   render() {
     const { post } = this.props;
     return (
-      <BaseLayout>
+      <BaseLayout {...this.props.auth}>
         <BasePage>
           <h1>I am Portfolio page</h1>
           <h2>{post.title}</h2>

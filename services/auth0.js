@@ -62,6 +62,25 @@ class Auth0 {
     const expiresAt = Cookies.getJSON("expiresAt");
     return new Date().getTime() < expiresAt;
   }
+
+  clientAuth() {
+    return this.isAuthenticated();
+  }
+
+  serverAuth(req) {
+    if (req.headers.cookie) {
+      const expiresAtCookie = req.headers.cookie
+        .split(";")
+        .find(c => c.trim().startsWith("expiresAt="));
+
+      if (!expiresAtCookie) {
+        return undefined;
+      }
+
+      const expiresAt = expiresAtCookie.split("=")[1];
+      return new Date().getTime() < expiresAt;
+    }
+  }
 }
 
 const auth0Client = new Auth0();
