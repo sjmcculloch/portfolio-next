@@ -1,5 +1,6 @@
 const express = require("express");
 const next = require("next");
+const mongoose = require("mongoose");
 const routes = require("../routes");
 
 // SERVICE
@@ -19,6 +20,14 @@ const secretData = [
     description: "my secret passwords"
   }
 ];
+
+mongoose
+  .connect(
+    "mongodb://smcculloch:testtest1@ds161764.mlab.com:61764/portfolio-sm-dev",
+    { useNewUrlParser: true }
+  )
+  .then(() => console.log("db connected"))
+  .catch(err => console.error(err));
 
 app
   .prepare()

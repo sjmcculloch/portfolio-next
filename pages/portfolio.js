@@ -24,7 +24,6 @@ class Portfolio extends Component {
     return (
       <BaseLayout {...this.props.auth}>
         <BasePage>
-          <h1>I am Portfolio page</h1>
           <h2>{post.title}</h2>
         </BasePage>
       </BaseLayout>

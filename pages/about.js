@@ -6,7 +6,7 @@ class About extends Component {
   render() {
     return (
       <BaseLayout {...this.props.auth}>
-        <BasePage className="about-page">
+        <BasePage className="about-page" title="I am about page">
           <h1> I am about page</h1>
         </BasePage>
       </BaseLayout>
