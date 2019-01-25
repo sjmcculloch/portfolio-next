@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import moment from "moment";
 import BaseLayout from "../components/layouts/BaseLayout";
 import BasePage from "../components/BasePage";
 import PortfolioCreateForm from "../components/portfolios/PortfolioCreateForm";
@@ -16,8 +17,8 @@ const INITIAL_VALUES = {
   location: "",
   position: "",
   description: "",
-  startDate: "",
-  endDate: ""
+  startDate: moment(),
+  endDate: moment()
 };
 
 class PortfolioNew extends Component {
