@@ -1,29 +1,9 @@
 import React from "react";
 import HoverMenu from "./HoverMenu";
+import ControllMenu from "./ControllMenu";
 import { Editor } from "slate-react";
-import { Value } from "slate";
-import { renderMark } from "./renderers";
-
-const initialValue = Value.fromJSON({
-  document: {
-    nodes: [
-      {
-        object: "block",
-        type: "paragraph",
-        nodes: [
-          {
-            object: "text",
-            leaves: [
-              {
-                text: "A line of text in a paragraph."
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
-});
+import { initialValue } from "./initial-value";
+import { renderMark, renderNode } from "./renderers";
 
 function CodeNode(props) {
   return (
@@ -80,6 +60,29 @@ class SlateEditor extends React.Component {
       rect.width / 2}px`;
   };
 
+  getTitle() {
+    const { value } = this.state;
+    const firstBlock = value.document.getBlocks().get(0);
+    const secondBlock = value.document.getBlocks().get(1);
+
+    const title = firstBlock && firstBlock.text ? firstBlock.text : "no Title";
+    const subtitle =
+      secondBlock && secondBlock.text ? secondBlock.text : "no SubTitle";
+
+    return {
+      title,
+      subtitle
+    };
+  }
+
+  save() {
+    const { save } = this.props;
+
+    const headingValues = this.getTitle();
+
+    save(headingValues);
+  }
+
   // Render the editor.
   render() {
     const { isLoaded } = this.state;
@@ -88,10 +91,12 @@ class SlateEditor extends React.Component {
       <React.Fragment>
         {isLoaded && (
           <Editor
+            {...this.props}
             placeholder="Enter some text..."
             value={this.state.value}
             onChange={this.onChange}
             renderMark={renderMark}
+            renderNode={renderNode}
             renderEditor={this.renderEditor}
           />
         )}
@@ -101,8 +106,10 @@ class SlateEditor extends React.Component {
 
   renderEditor = (props, editor, next) => {
     const children = next();
+    const { isLoading } = props;
     return (
       <React.Fragment>
+        <ControllMenu isLoading={isLoading} save={() => this.save()} />
         {children}
         <HoverMenu innerRef={menu => (this.menu = menu)} editor={editor} />
       </React.Fragment>
