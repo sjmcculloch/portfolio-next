@@ -4,6 +4,9 @@ import ControllMenu from "./ControllMenu";
 import { Editor } from "slate-react";
 import { initialValue } from "./initial-value";
 import { renderMark, renderNode } from "./renderers";
+import Html from "slate-html-serializer";
+import { rules } from "./rules";
+const html = new Html({ rules });
 
 function CodeNode(props) {
   return (
@@ -66,21 +69,23 @@ class SlateEditor extends React.Component {
     const secondBlock = value.document.getBlocks().get(1);
 
     const title = firstBlock && firstBlock.text ? firstBlock.text : "no Title";
-    const subtitle =
+    const subTitle =
       secondBlock && secondBlock.text ? secondBlock.text : "no SubTitle";
 
     return {
       title,
-      subtitle
+      subTitle
     };
   }
 
   save() {
-    const { save } = this.props;
+    const { value } = this.state;
+    const { save, isLoading } = this.props;
 
     const headingValues = this.getTitle();
+    const text = html.serialize(value);
 
-    save(headingValues);
+    !isLoading && save(text, headingValues);
   }
 
   // Render the editor.
