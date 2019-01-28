@@ -11,6 +11,20 @@ router.post(
   blogCtrl.createBlog
 );
 
+router.get(
+  "/me",
+  authService.checkJWT,
+  authService.checkRole("siteOwner"),
+  blogCtrl.getUserBlogs
+);
+
 router.get("/:id", blogCtrl.getBlogById);
+
+router.patch(
+  "/:id",
+  authService.checkJWT,
+  authService.checkRole("siteOwner"),
+  blogCtrl.updateBlog
+);
 
 module.exports = router;

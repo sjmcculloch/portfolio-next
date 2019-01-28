@@ -5,6 +5,8 @@ import { Editor } from "slate-react";
 import { initialValue } from "./initial-value";
 import { renderMark, renderNode } from "./renderers";
 import Html from "slate-html-serializer";
+import { Value } from "slate";
+
 import { rules } from "./rules";
 const html = new Html({ rules });
 
@@ -22,12 +24,17 @@ function BoldMark(props) {
 
 class SlateEditor extends React.Component {
   state = {
-    value: initialValue,
+    value: Value.create(),
     isLoaded: false
   };
 
   componentDidMount() {
-    this.setState({ isLoaded: true });
+    const valueFromProps = this.props.initialValue;
+    const value = valueFromProps
+      ? Value.fromJSON(html.deserialize(valueFromProps))
+      : Value.fromJSON(initialValue);
+
+    this.setState({ isLoaded: true, value });
     this.updateMenu();
   }
 
@@ -37,6 +44,17 @@ class SlateEditor extends React.Component {
 
   onChange = ({ value }) => {
     this.setState({ value });
+  };
+
+  onKeyDown = (event, change, next) => {
+    const { isLoading } = this.props;
+
+    if (!isLoading && event.which === 83 && (event.ctrlKey || event.metaKey)) {
+      event.preventDefault();
+      this.save();
+      return;
+    }
+    next();
   };
 
   updateMenu = () => {
@@ -100,6 +118,7 @@ class SlateEditor extends React.Component {
             placeholder="Enter some text..."
             value={this.state.value}
             onChange={this.onChange}
+            onKeyDown={this.onKeyDown}
             renderMark={renderMark}
             renderNode={renderNode}
             renderEditor={this.renderEditor}
