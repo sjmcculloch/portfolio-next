@@ -2,8 +2,6 @@ import React from "react";
 import BaseLayout from "../layouts/BaseLayout";
 import BasePage from "../BasePage";
 
-const namespace = "http://localhost:3000/";
-
 export default role => Component =>
   class withAuth extends React.Component {
     static async getInitialProps(args) {
@@ -16,7 +14,7 @@ export default role => Component =>
 
     renderProtectedPage() {
       const { isAuthenticated, user } = this.props.auth;
-      const userRole = user && user[`${namespace}role`];
+      const userRole = user && user[`${process.env.NAMESPACE}/role`];
       let isAuthorized = false;
 
       if (role) {
@@ -31,7 +29,10 @@ export default role => Component =>
         return (
           <BaseLayout {...this.props.auth}>
             <BasePage>
-              <h1>You are not authenticated</h1>
+              <h1>
+                {" "}
+                You are not authenticated. Please Login to access this page.{" "}
+              </h1>
             </BasePage>
           </BaseLayout>
         );
@@ -39,7 +40,11 @@ export default role => Component =>
         return (
           <BaseLayout {...this.props.auth}>
             <BasePage>
-              <h1>You are not authorized</h1>
+              <h1>
+                {" "}
+                You are not authorized. You dont have a permission to visit this
+                page{" "}
+              </h1>
             </BasePage>
           </BaseLayout>
         );
@@ -47,6 +52,7 @@ export default role => Component =>
         return <Component {...this.props} />;
       }
     }
+
     render() {
       return this.renderProtectedPage();
     }

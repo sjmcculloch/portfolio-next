@@ -104,3 +104,10 @@ export const updateBlog = (blogData, blogId) => {
     .then(response => response.data)
     .catch(err => rejectPromise(err));
 };
+
+export const deleteBlog = blogId => {
+  return axiosInstance
+    .delete(`/blogs/${blogId}`, setAuthHeader())
+    .then(response => response.data)
+    .catch(err => rejectPromise(err));
+};

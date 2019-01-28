@@ -1,14 +1,15 @@
 const jwt = require("express-jwt");
 const jwksRsa = require("jwks-rsa");
 
-const namespace = "http://localhost:3000/";
+const config = require("../config");
+const NAMESPACE = config.NAMESPACE;
 
 // MIDDLEWARE
 exports.checkJWT = jwt({
   secret: jwksRsa.expressJwtSecret({
     cache: true,
     rateLimit: true,
-    jwksRequestsPerMinute: 10, // Default value
+    jwksRequestsPerMinute: 15, // Default value
     jwksUri: "https://mamapp.auth0.com/.well-known/jwks.json"
   }),
   audience: "VciEgFSYaIjI8H5vE021v8NSnzrcL9fT",
@@ -19,7 +20,7 @@ exports.checkJWT = jwt({
 exports.checkRole = role => (req, res, next) => {
   const user = req.user;
 
-  if (user && user[namespace + "role"] === role) {
+  if (user && user[NAMESPACE + "/role"] && user[NAMESPACE + "/role"] === role) {
     next();
   } else {
     return res.status(401).send({

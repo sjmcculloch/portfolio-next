@@ -1,6 +1,31 @@
 const Blog = require("../models/blog");
+const slugify = require("slugify");
 const AsyncLock = require("async-lock");
 const lock = new AsyncLock();
+
+exports.getBlogs = (req, res) => {
+  Blog.find({ status: "published" })
+    .sort({ createdAt: -1 })
+    .exec(function(err, publishedBlogs) {
+      if (err) {
+        return res.status(422).send(err);
+      }
+
+      return res.json(publishedBlogs);
+    });
+};
+
+exports.getBlogBySlug = (req, res) => {
+  const slug = req.params.slug;
+
+  Blog.findOne({ slug }, function(err, foundBlog) {
+    if (err) {
+      return res.status(422).send(err);
+    }
+
+    return res.json(foundBlog);
+  });
+};
 
 exports.createBlog = (req, res) => {
   const lockId = req.query.lockId;
@@ -69,13 +94,13 @@ exports.updateBlog = (req, res) => {
       return res.status(422).send(err);
     }
 
-    // if (blogData.status && blogData.status === "published" && !foundBlog.slug) {
-    //   foundBlog.slug = slugify(foundBlog.title, {
-    //     replacement: "-", // replace spaces with replacement
-    //     remove: null, // regex to remove characters
-    //     lower: true // result in lower case
-    //   });
-    // }
+    if (blogData.status && blogData.status === "published" && !foundBlog.slug) {
+      foundBlog.slug = slugify(foundBlog.title, {
+        replacement: "-", // replace spaces with replacement
+        remove: null, // regex to remove characters
+        lower: true // result in lower case
+      });
+    }
 
     foundBlog.set(blogData);
     foundBlog.updatedAt = new Date();
@@ -86,5 +111,17 @@ exports.updateBlog = (req, res) => {
 
       return res.json(foundBlog);
     });
+  });
+};
+
+exports.deleteBlog = (req, res) => {
+  const blogId = req.params.id;
+
+  Blog.deleteOne({ _id: blogId }, function(err) {
+    if (err) {
+      return res.status(422).send(err);
+    }
+
+    res.json({ status: "deleted" });
   });
 };

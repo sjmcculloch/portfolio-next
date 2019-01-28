@@ -1,15 +1,15 @@
-import React, { Component } from "react";
+import React from "react";
 import BaseLayout from "../components/layouts/BaseLayout";
 import BasePage from "../components/BasePage";
-import { Container, Row, Col } from "reactstrap";
-import { Link } from "../routes";
+import { Container, Row, Col, Button } from "reactstrap";
 import PortButtonDropdown from "../components/ButtonDropdown";
 
 import withAuth from "../components/hoc/withAuth";
+import { Link, Router } from "../routes";
 
-import { getUserBlogs } from "../actions";
+import { getUserBlogs, updateBlog, deleteBlog } from "../actions";
 
-class UserBlogs extends Component {
+class UserBlogs extends React.Component {
   static async getInitialProps({ req }) {
     let blogs = [];
 
@@ -22,15 +22,41 @@ class UserBlogs extends Component {
     return { blogs };
   }
 
-  seperateBlogs(blogs) {
+  changeBlogStatus(status, blogId) {
+    updateBlog({ status }, blogId)
+      .then(() => {
+        Router.pushRoute("/userBlogs");
+      })
+      .catch(err => {
+        console.error(err.message);
+      });
+  }
+
+  deleteBlogWarning(blogId) {
+    const res = confirm("Are you sure you want to delete this blog post?");
+
+    if (res) {
+      this.deleteBlog(blogId);
+    }
+  }
+
+  deleteBlog(blogId) {
+    deleteBlog(blogId)
+      .then(status => {
+        Router.pushRoute("/userBlogs");
+      })
+      .catch(err => console.error(err.message));
+  }
+
+  separateBlogs(blogs) {
     const published = [];
-    const draft = [];
+    const drafts = [];
 
     blogs.forEach(blog => {
-      blog.status === "draft" ? draft.push(blog) : published.push(blog);
+      blog.status === "draft" ? drafts.push(blog) : published.push(blog);
     });
 
-    return { published, draft };
+    return { published, drafts };
   }
 
   createStatus(status) {
@@ -73,10 +99,10 @@ class UserBlogs extends Component {
 
   render() {
     const { blogs } = this.props;
-    const { published, draft } = this.seperateBlogs(blogs);
+    const { published, drafts } = this.separateBlogs(blogs);
 
     return (
-      <BaseLayout headerType={"landing"} {...this.props.auth}>
+      <BaseLayout {...this.props.auth} headerType={"landing"}>
         <div
           className="masthead"
           style={{ backgroundImage: "url('/static/images/home-bg.jpg')" }}
@@ -86,8 +112,13 @@ class UserBlogs extends Component {
             <div className="row">
               <div className="col-lg-8 col-md-10 mx-auto">
                 <div className="site-heading">
-                  <h1>Fresh Blogs</h1>
-                  <span className="subheading">Programming, travelling...</span>
+                  <h1>Blogs Dashboard</h1>
+                  <span className="subheading">
+                    Let's write some nice blog today{" "}
+                    <Link route="/blogs/new">
+                      <Button color="primary">Create a new Blog</Button>
+                    </Link>
+                  </span>
                 </div>
               </div>
             </div>
@@ -96,12 +127,12 @@ class UserBlogs extends Component {
         <BasePage className="blog-user-page">
           <Row>
             <Col md="6" className="mx-auto text-center">
-              <h2 className="blog-status-title">Published Blogs</h2>
+              <h2 className="blog-status-title"> Published Blogs </h2>
               {this.renderBlogs(published)}
             </Col>
             <Col md="6" className="mx-auto text-center">
-              <h2 className="blog-status-title">Draft Blogs</h2>
-              {this.renderBlogs(draft)}
+              <h2 className="blog-status-title"> Draft Blogs </h2>
+              {this.renderBlogs(drafts)}
             </Col>
           </Row>
         </BasePage>

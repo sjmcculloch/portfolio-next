@@ -1,13 +1,15 @@
-import React, { Component } from "react";
+import React from "react";
 import BaseLayout from "../components/layouts/BaseLayout";
 import BasePage from "../components/BasePage";
-import { Button, Col, Row } from "reactstrap";
+import { Link } from "../routes";
+import { Col, Row, Button } from "reactstrap";
 import PortfolioCard from "../components/portfolios/PortfolioCard";
 
 import { Router } from "../routes";
-import { deletePortfolio, getPortfolios } from "../actions/index";
 
-class Portfolios extends Component {
+import { getPortfolios, deletePortfolio } from "../actions";
+
+class Portfolios extends React.Component {
   static async getInitialProps() {
     let portfolios = [];
 
@@ -28,7 +30,7 @@ class Portfolios extends Component {
   displayDeleteWarning(portfolioId, e) {
     e.stopPropagation();
     const isConfirm = confirm(
-      "Are you sure you want to delete this portfolio?"
+      "Are you sure you want to delete this portfolio???"
     );
 
     if (isConfirm) {
@@ -39,8 +41,7 @@ class Portfolios extends Component {
   deletePortfolio(portfolioId) {
     deletePortfolio(portfolioId)
       .then(() => {
-        // decide
-        Router.push("/portfolios");
+        Router.pushRoute("/portfolios");
       })
       .catch(err => console.error(err));
   }
@@ -50,7 +51,7 @@ class Portfolios extends Component {
 
     return portfolios.map((portfolio, index) => {
       return (
-        <Col md="4" key={index}>
+        <Col key={index} md="4">
           <PortfolioCard portfolio={portfolio}>
             {isAuthenticated && isSiteOwner && (
               <React.Fragment>
@@ -77,14 +78,18 @@ class Portfolios extends Component {
   render() {
     const { portfolios } = this.props;
     const { isAuthenticated, isSiteOwner } = this.props.auth;
+
     return (
-      <BaseLayout {...this.props.auth}>
+      <BaseLayout
+        title="Filip Jerga - Learn About My Experience"
+        {...this.props.auth}
+      >
         <BasePage className="portfolio-page" title="Portfolios">
           {isAuthenticated && isSiteOwner && (
             <Button
-              onClick={() => Router.pushRoute("/portfolioNew")}
-              className="create-port-btn"
+              onClick={() => Router.pushRoute("/portfolios/new")}
               color="success"
+              className="create-port-btn"
             >
               Create Portfolio
             </Button>

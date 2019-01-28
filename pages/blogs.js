@@ -1,18 +1,54 @@
-import React, { Component } from "react";
+import React from "react";
 import BaseLayout from "../components/layouts/BaseLayout";
 import BasePage from "../components/BasePage";
 
 import { Container, Row, Col } from "reactstrap";
 import { Link } from "../routes";
+
+import { getBlogs } from "../actions";
+import { shortenText } from "../helpers/utils";
+
 import moment from "moment";
 
-class Blogs extends Component {
+class Blogs extends React.Component {
+  static async getInitialProps({ req }) {
+    let blogs = [];
+
+    try {
+      blogs = await getBlogs(req);
+    } catch (err) {
+      console.error(err);
+    }
+
+    return { blogs };
+  }
+
+  renderBlogs = blogs =>
+    blogs.map((blog, index) => (
+      <div key={index} className="post-preview">
+        <Link route={`/blogs/${blog.slug}`}>
+          <a>
+            <h2 className="post-title">{blog.title}</h2>
+            <h3 className="post-subtitle">{shortenText(blog.subTitle)}</h3>
+          </a>
+        </Link>
+        <p className="post-meta">
+          Posted by
+          <a href="#"> {blog.author} </a>
+          {moment(blog.createdA).format("LL")}
+        </p>
+      </div>
+    ));
+
   render() {
+    const { blogs } = this.props;
+
     return (
       <BaseLayout
+        {...this.props.auth}
         headerType={"landing"}
         className="blog-listing-page"
-        {...this.props.auth}
+        title="Filip Jerga - Newest Blogs to Read"
       >
         <div
           className="masthead"
@@ -33,58 +69,7 @@ class Blogs extends Component {
         <BasePage className="blog-body">
           <Row>
             <Col md="10" lg="8" className="mx-auto">
-              {
-                <React.Fragment>
-                  <div className="post-preview">
-                    <Link route={`/blogs/blogId`}>
-                      <a>
-                        <h2 className="post-title">Very Nice Blog Post</h2>
-                        <h3 className="post-subtitle">
-                          How I Start Porgramming...
-                        </h3>
-                      </a>
-                    </Link>
-                    <p className="post-meta">
-                      Posted by
-                      <a href="#"> Filip Jerga </a>
-                      {moment().format("LLLL")}
-                    </p>
-                  </div>
-                  <hr />
-                  <div className="post-preview">
-                    <Link route={`/blogs/blogId`}>
-                      <a>
-                        <h2 className="post-title">Very Nice Blog Post</h2>
-                        <h3 className="post-subtitle">
-                          How I Start Porgramming...
-                        </h3>
-                      </a>
-                    </Link>
-                    <p className="post-meta">
-                      Posted by
-                      <a href="#"> Filip Jerga </a>
-                      {moment().format("LLLL")}
-                    </p>
-                  </div>
-                  <hr />
-                  <div className="post-preview">
-                    <Link route={`/blogs/blogId`}>
-                      <a>
-                        <h2 className="post-title">Very Nice Blog Post</h2>
-                        <h3 className="post-subtitle">
-                          How I Start Porgramming...
-                        </h3>
-                      </a>
-                    </Link>
-                    <p className="post-meta">
-                      Posted by
-                      <a href="#"> Filip Jerga </a>
-                      {moment().format("LLLL")}
-                    </p>
-                  </div>
-                  <hr />
-                </React.Fragment>
-              }
+              {this.renderBlogs(blogs)}
               <div className="clearfix">
                 <a className="btn btn-primary float-right" href="#">
                   Older Posts &rarr;
@@ -99,15 +84,10 @@ class Blogs extends Component {
                 <div className="col-lg-8 col-md-10 mx-auto">
                   <ul className="list-inline text-center">
                     <li className="list-inline-item">
-                      <a href="#">
-                        <span className="fa-stack fa-lg">
-                          <i className="fas fa-circle fa-stack-2x" />
-                          <i className="fab fa-twitter fa-stack-1x fa-inverse" />
-                        </span>
-                      </a>
-                    </li>
-                    <li className="list-inline-item">
-                      <a href="#">
+                      <a
+                        target="_blank"
+                        href="https://www.facebook.com/groups/217273012433804/?jazoest=26510012195869511271971084598756511378108122691091131211141201017010910474116557610010645897511574116115668565119119586510012177701165586491061151219048557183120488290847377451207611983109114112118697610912011183109109521091159581"
+                      >
                         <span className="fa-stack fa-lg">
                           <i className="fas fa-circle fa-stack-2x" />
                           <i className="fab fa-facebook-f fa-stack-1x fa-inverse" />
@@ -115,7 +95,7 @@ class Blogs extends Component {
                       </a>
                     </li>
                     <li className="list-inline-item">
-                      <a href="#">
+                      <a target="_blank" href="https://github.com/Jerga99">
                         <span className="fa-stack fa-lg">
                           <i className="fas fa-circle fa-stack-2x" />
                           <i className="fab fa-github fa-stack-1x fa-inverse" />
@@ -131,6 +111,11 @@ class Blogs extends Component {
             </Container>
           </footer>
         </BasePage>
+        <style jsx>
+          {`
+            @import url("https://use.fontawesome.com/releases/v5.5.0/css/all.css");
+          `}
+        </style>
       </BaseLayout>
     );
   }

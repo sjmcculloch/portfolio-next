@@ -1,8 +1,16 @@
-@import "./shared/fonts";
 @import "./shared/colors";
+@import "./shared/mixins";
+
+@import "./shared/fonts";
+
+// PAGES
 @import "./index";
 @import "./portfolios";
 @import "./blogs";
+@import "./about";
+//@import './cv';
+
+// COMPONENTS
 @import "./header";
 @import "./slate";
 
